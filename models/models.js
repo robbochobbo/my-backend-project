@@ -1,15 +1,32 @@
 const db = require('../db/connection')
 
-const fetchAllTopics = () => {
-    console.log("in model")
+const fetchAllTopics = (sort_by='slug', order='ASC', slug) => {
 
-    let queryString = 'SELECT * FROM topics'
+    const queryValues = []
+    
+    let queryString = `SELECT * FROM topics`
 
-    return db.query(queryString)
+    if (slug){
+        queryValues.push(slug)
+        queryString += ` WHERE slug = $1`
+    }
+
+    const validSortBys = ['slug','description']
+    if(!validSortBys.includes(sort_by)){
+        return Promise.reject({status: 400, msg:'Bad request'})
+    } else{
+        queryString += ` ORDER BY ${sort_by}`
+    }
+
+    const validOrders = ['ASC', 'DESC']
+    if(!validOrders.includes(order.toUpperCase())){
+        return Promise.reject({status: 400, msg:'Bad request'})
+    } else{
+        queryString += ` ${order.toUpperCase()};`
+    }
+
+    return db.query(queryString, queryValues)
     .then((body) => {
-        if (body.rows.length === 0){
-            return Promise.reject({status: 204, msg:'No data here yet'})
-        }
         return body.rows
     })
 }

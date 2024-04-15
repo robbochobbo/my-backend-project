@@ -1,14 +1,16 @@
 const express = require('express')
 const app = express()
+const endpoints = require('./endpoints.json')
 
 const {
     getAllTopics
 } = require('./controllers/controllers')
 
-app.use(express.json())
+app.get('/api', (req, res) => {
+    res.status(200).send({endpoints})
+})
 
 app.get('/api/topics', getAllTopics)
-
 
 
 // error handling
@@ -18,7 +20,7 @@ app.get('/api/*', (req, res, next) => {
 
 app.use((err, req, res, next) => {
     if (err.status && err.msg){
-        res.status(err.status).send({msg: err.msg})
+        res.status(err.status).send({ msg: err.msg })
     }
     else next(err)
 })
