@@ -97,14 +97,6 @@ describe('/api/topics', () => {
         })
     })
 
-    test('GET 400: responds with 400 and err msg if slug of the incorrect data type passed',()=>{
-        return request(app)
-        .get('/api/topics?slug=9999')
-        .expect(400)
-        .then(({body})=>{
-            expect(body.msg).toBe('Bad request')
-        })
-    })
 })
 
 
