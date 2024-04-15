@@ -1,3 +1,6 @@
 # Northcoders News API
 
-For instructions, please head over to [L2C NC News](https://l2c.northcoders.com/courses/be/nc-news).
+To run this repo locally, you must set your environment variables:
+    - create .env.type_of_env_variable (e.g. .env.test or .env.development)
+    - make sure to git.ignore these new .env files
+    - set your database in these files using PGDATABASE=name_of_database
