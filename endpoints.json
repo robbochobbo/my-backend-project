@@ -27,19 +27,9 @@
     }
   },
   "GET /api/articles/:article_id": {
-    "description": "serves an array of all articles of a given article_id",
+    "description": "serves an array of an article object of a given article_id",
     "exampleResponse": {
         "articles": [
-          {
-            "author": "icellusedkars",
-            "title": "Eight pug gifs that remind me of mitch",
-            "article_id": 3,
-            "body": "some gifs",
-            "topic": "mitch",
-            "created_at": "2020-11-03T09:12:00.000Z",
-            "votes": 0,
-            "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-          },
           {
             "author": "icellusedkars",
             "title": "Eight pug gifs that remind me of mitch",
