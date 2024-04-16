@@ -3,14 +3,17 @@ const app = express()
 const endpoints = require('./endpoints.json')
 
 const {
-    getAllTopics
-} = require('./controllers/controllers')
+    getAllTopics,
+    getArticleById } = require('./controllers/controllers')
 
 app.get('/api', (req, res) => {
     res.status(200).send({endpoints})
 })
 
 app.get('/api/topics', getAllTopics)
+
+app.get('/api/articles/:article_id', getArticleById)
+
 
 
 // error handling
