@@ -1,7 +1,8 @@
 const { 
     fetchAllTopics, 
     fetchArticleById,
-    fetchAllArticles 
+    fetchAllArticles,
+    fetchCommentsByArticleId
 } = require("../models/models")
 
 const getAllTopics = (req, res, next) => {
@@ -23,9 +24,16 @@ const getArticleById = (req, res, next) => {
 }
 
 const getAllArticles = (req, res, next) => {
-    const { sort_by, order } = req.query
-    fetchAllArticles(sort_by, order).then((articles) => {
+    fetchAllArticles().then((articles) => {
         res.status(200).send({articles})
+    })
+    .catch((err) => next(err))
+}
+
+const getCommentsByArticleId = (req, res, next) => {
+    const { article_id } = req.params
+    fetchCommentsByArticleId(article_id).then((comments) => {
+        res.status(200).send({comments})
     })
     .catch((err) => next(err))
 }
@@ -33,5 +41,6 @@ const getAllArticles = (req, res, next) => {
 module.exports = { 
     getAllTopics,
     getArticleById,
-    getAllArticles
+    getAllArticles,
+    getCommentsByArticleId
 }
