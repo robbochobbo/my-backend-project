@@ -112,22 +112,20 @@ describe('/api/topics', () => {
 })
 
 describe('/api/articles/:article_id', () => {
-    test('GET 200: responds with correct number of article objects with the correct properties', () => {
+    test('GET 200: responds with 1 of article object with the correct properties', () => {
         return request(app)
         .get('/api/articles/3')
         .expect(200)
-        .then(({body : {articles}}) => {
-            expect(articles.length).toBe(2)
-            articles.forEach((article) => {
-                expect(typeof article.author).toBe('string')
-                expect(typeof article.title).toBe('string')
-                expect(typeof article.article_id).toBe('number')
-                expect(typeof article.body).toBe('string')
-                expect(typeof article.topic).toBe('string')
-                expect(typeof article.created_at).toBe('string')
-                expect(typeof article.votes).toBe('number')
-                expect(typeof article.article_img_url).toBe('string')
-            })
+        .then(({body : {article}}) => {
+            expect(article.length).toBe(1)
+            expect(typeof article[0].author).toBe('string')
+            expect(typeof article[0].title).toBe('string')
+            expect(typeof article[0].article_id).toBe('number')
+            expect(typeof article[0].body).toBe('string')
+            expect(typeof article[0].topic).toBe('string')
+            expect(typeof article[0].created_at).toBe('string')
+            expect(typeof article[0].votes).toBe('number')
+            expect(typeof article[0].article_img_url).toBe('string')
         })
     })
     test('GET 404: responds with 404 and err msg if article does not exist', () => {
@@ -147,4 +145,7 @@ describe('/api/articles/:article_id', () => {
         })
     })
 })
+
+
+
 
