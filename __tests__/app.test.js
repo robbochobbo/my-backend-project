@@ -176,6 +176,49 @@ describe('/api/articles', () => {
     })
 })
 
+describe('/api/articles/:article_id/comments', () => {
+    test('GET 200: responds with an array of comments for given article_id with correct properties', () => {
+        return request(app)
+        .get('/api/articles/3/comments')
+        .expect(200)
+        .then(({body: {comments}}) => {
+            expect(comments.length).toBe(2)
+            comments.forEach((comment) => {
+                expect(typeof comment.comment_id).toBe('number')
+                expect(typeof comment.votes).toBe('number')
+                expect(typeof comment.created_at).toBe('string')
+                expect(typeof comment.author).toBe('string')
+                expect(typeof comment.body).toBe('string')
+                expect(typeof comment.article_id).toBe('number')
+            }) 
+        })
+    })
+    test('GET 200: responds with comments sorted by date descending', () => {
+        return request(app)
+        .get('/api/articles/1/comments')
+        .expect(200)
+        .then(({body: {comments}}) => {
+            expect(comments).toBeSortedBy('created_at',{descending:true})
+        })
+    })
+    test('GET 404: responds with 404 and err msg if article_id does not exist', () => {
+        return request(app)
+        .get('/api/articles/9999/comments')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe('Article does not exist')
+        })
+    })
+    test('GET 400: responds with 400 and err msg if user passes invalid article id type', () => {
+        return request(app)
+        .get('/api/articles/invalid_id/comments')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    })
+})
+
 
 
 

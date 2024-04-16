@@ -1,9 +1,7 @@
 const db = require('../db/connection')
 
 const fetchAllTopics = (sort_by='slug', order='ASC', slug) => {
-
     const queryValues = []
-    
     let queryString = `SELECT * FROM topics`
 
     if (slug){
@@ -33,7 +31,6 @@ const fetchAllTopics = (sort_by='slug', order='ASC', slug) => {
 }
 
 const fetchArticleById = (article_id) => {
-
     if(isNaN(article_id)){
         return Promise.reject({status: 400, msg:'Bad request'})
     }
@@ -50,8 +47,7 @@ const fetchArticleById = (article_id) => {
     });
 }
 
-const fetchAllArticles = (sort_by='created_at',  order='DESC') => {
-
+const fetchAllArticles = () => {
     return db
     .query(`SELECT 
             articles.author,
@@ -72,8 +68,32 @@ const fetchAllArticles = (sort_by='created_at',  order='DESC') => {
          })
 }
 
+const fetchCommentsByArticleId = (article_id) => {
+    if(isNaN(article_id)){
+        return Promise.reject({status: 400, msg:'Bad request'})
+    }
+    return db
+    .query(`SELECT 
+            comments.comment_id,
+            comments.votes,
+            comments.created_at,
+            comments.author,
+            comments.body,
+            comments.article_id
+            FROM comments
+            WHERE comments.article_id = $1
+            ORDER BY created_at DESC;`, [article_id])
+    .then((body) => {
+        if(body.rows.length === 0){
+            return Promise.reject({status: 404, msg:'Article does not exist'})
+          }
+        return body.rows
+    })
+}
+
 module.exports = { 
     fetchAllTopics,
     fetchArticleById,
-    fetchAllArticles
+    fetchAllArticles,
+    fetchCommentsByArticleId
 }
