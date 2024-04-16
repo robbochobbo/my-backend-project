@@ -4,6 +4,7 @@ const seed = require('../db/seeds/seed')
 const testData = require('../db/data/test-data/index')
 const request = require('supertest')
 const endpoints = require('../endpoints.json')
+const articles = require('../db/data/test-data/articles')
 
 beforeAll(() => seed(testData))
 afterAll(() => db.end())
@@ -142,6 +143,35 @@ describe('/api/articles/:article_id', () => {
         .expect(400)
         .then(({body}) => {
             expect(body.msg).toBe('Bad request')
+        })
+    })
+})
+
+describe('/api/articles', () => {
+    test('GET 200: responds with an array of objects of articles, each with the correct properties', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body: {articles}}) => {
+            articles.forEach((article) => {
+                expect(typeof article.author).toBe('string')
+                expect(typeof article.title).toBe('string')
+                expect(typeof article.article_id).toBe('number')
+                expect(typeof article.topic).toBe('string')
+                expect(typeof article.created_at).toBe('string')
+                expect(typeof article.votes).toBe('number')
+                expect(typeof article.article_img_url).toBe('string')
+                expect(typeof article.comment_count).toBe('string')
+            })
+        })
+    })
+
+    test('GET 200: responds with articles sorted by date descending', () => {
+        return request(app)
+        .get('/api/articles')
+        .expect(200)
+        .then(({body: {articles}}) => {
+            expect(articles).toBeSortedBy('created_at',{descending:true})
         })
     })
 })

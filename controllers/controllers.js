@@ -1,6 +1,7 @@
 const { 
     fetchAllTopics, 
-    fetchArticleById 
+    fetchArticleById,
+    fetchAllArticles 
 } = require("../models/models")
 
 const getAllTopics = (req, res, next) => {
@@ -15,14 +16,22 @@ const getAllTopics = (req, res, next) => {
 
 const getArticleById = (req, res, next) => {
     const { article_id } = req.params
-    fetchArticleById(article_id).then((articles) => {
+    fetchArticleById(article_id).then((article) => {
+        res.status(200).send({article})
+    })
+    .catch((err) => next(err))
+}
+
+const getAllArticles = (req, res, next) => {
+    const { sort_by, order } = req.query
+    fetchAllArticles(sort_by, order).then((articles) => {
         res.status(200).send({articles})
     })
     .catch((err) => next(err))
 }
 
-
 module.exports = { 
     getAllTopics,
-    getArticleById
+    getArticleById,
+    getAllArticles
 }
