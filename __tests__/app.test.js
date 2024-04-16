@@ -8,6 +8,17 @@ const endpoints = require('../endpoints.json')
 beforeAll(() => seed(testData))
 afterAll(() => db.end())
 
+describe('/api', () => {
+    test('GET 200: responds with up-to-date description of all other available endpoints', () => {
+        return request(app)
+        .get('/api')
+        .expect(200)
+        .then(({body}) => {
+            expect(body).toEqual({"endpoints": endpoints})
+        })
+    })
+})
+
 describe('/api/not_an_endpoint', () => {
     test('GET:404 responds with error msg if endpoint does not exist', () => {
         return request(app)
@@ -100,13 +111,39 @@ describe('/api/topics', () => {
 
 })
 
-describe('/api', () => {
-    test('GET 200: responds with up-to-date description of all other available endpoints', () => {
+describe('/api/articles/:article_id', () => {
+    test('GET 200: responds with correct number of article objects with the correct properties', () => {
         return request(app)
-        .get('/api')
+        .get('/api/articles/3')
         .expect(200)
+        .then(({body : {articles}}) => {
+            expect(articles.length).toBe(2)
+            articles.forEach((article) => {
+                expect(typeof article.author).toBe('string')
+                expect(typeof article.title).toBe('string')
+                expect(typeof article.article_id).toBe('number')
+                expect(typeof article.body).toBe('string')
+                expect(typeof article.topic).toBe('string')
+                expect(typeof article.created_at).toBe('string')
+                expect(typeof article.votes).toBe('number')
+                expect(typeof article.article_img_url).toBe('string')
+            })
+        })
+    })
+    test('GET 404: responds with 404 and err msg if article does not exist', () => {
+        return request(app)
+        .get('/api/articles/102')
+        .expect(404)
         .then(({body}) => {
-            expect(body).toEqual({"endpoints": endpoints})
+            expect(body.msg).toBe('Article does not exist')
+        })
+    })
+    test('GET 400: responds with 400 and err msg if user passes invalid article id type', () => {
+        return request(app)
+        .get('/api/articles/invalid_id')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
         })
     })
 })

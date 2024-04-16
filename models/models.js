@@ -25,10 +25,42 @@ const fetchAllTopics = (sort_by='slug', order='ASC', slug) => {
         queryString += ` ${order.toUpperCase()};`
     }
 
-    return db.query(queryString, queryValues)
+    return db
+    .query(queryString, queryValues)
     .then((body) => {
         return body.rows
     })
 }
 
-module.exports = { fetchAllTopics }
+const fetchArticleById = (article_id) => {
+
+    if(isNaN(article_id)){
+        return Promise.reject({status: 400, msg:'Bad request'})
+    }
+
+    return db
+    .query(`SELECT 
+    articles.author,
+    articles.title,
+    comments.article_id,
+    articles.body,
+    articles.topic,
+    articles.created_at,
+    articles.votes,
+    articles.article_img_url
+    FROM articles
+    JOIN comments
+    ON articles.article_id = comments.article_id
+    WHERE comments.article_id = $1;`, [article_id])
+    .then((body) => {
+      if(body.rows.length === 0){
+        return Promise.reject({status: 404, msg:'Article does not exist'})
+      }
+      return body.rows;
+    });
+}
+
+module.exports = { 
+    fetchAllTopics,
+    fetchArticleById
+}
