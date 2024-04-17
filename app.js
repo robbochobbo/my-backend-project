@@ -8,7 +8,8 @@ const {
     getAllArticles,
     getCommentsByArticleId,
     postComment,
-    patchArticleById
+    patchArticleById,
+    deleteCommentById
  } = require('./controllers/controllers')
 
 
@@ -26,8 +27,9 @@ app.patch('/api/articles/:article_id', patchArticleById)
 app.get('/api/articles', getAllArticles)
 
 app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
-
 app.post('/api/articles/:article_id/comments', postComment)
+
+app.delete('/api/comments/:comment_id', deleteCommentById)
 
 
 // error handling

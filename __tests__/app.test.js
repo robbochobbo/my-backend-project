@@ -287,7 +287,7 @@ describe('/api/articles/:article_id/comments', () => {
         })
     })
 
-    test('POST:400 responds with an 400 and msg when provided with an incomplete object (no body)', () => {
+    test('POST 400: responds with an 400 and msg when provided with an incomplete object (no body)', () => {
         return request(app)
         .post('/api/articles/3/comments')
         .send({
@@ -295,8 +295,41 @@ describe('/api/articles/:article_id/comments', () => {
         })
         .expect(400)
         .then(({body}) => {
-            expect(body.msg).toBe('Bad request');
-        });
-      });
+            expect(body.msg).toBe('Bad request')
+        })
+      })
+})
+
+describe('/api/comments/comment_id', () => {
+    test('DELETE 200: Responds with status 204 and no content, removes comment of given comment_id', () => {
+        return request(app)
+        .delete('/api/comments/1')
+        .expect(200)
+        .then(() => {
+            return db
+            .query(`SELECT * FROM comments`)
+        })
+        .then((body) => {
+            expect(body.rows.length).toBe(18)
+        })
+    })
+
+    test('DELETE 404: Responds with status 404 and msg if comment does not exist', () => {
+        return request(app)
+        .delete('/api/comments/99999')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe('Not found')
+        })
+    })
+
+    test('DELETE 400: Responds with status 400 and msg if passed invalid ID', () => {
+        return request(app)
+        .delete('/api/comments/invalid_id')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    })
 })
 
