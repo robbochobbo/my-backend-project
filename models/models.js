@@ -127,6 +127,15 @@ const removeCommentById = (comment_id) => {
     })
 }
 
+const fetchAllUsers = () => {
+    return db
+    .query(`SELECT * FROM users
+            ORDER BY username ASC;`)
+    .then((body) => { 
+        return body.rows
+         })
+}
+
 module.exports = { 
     fetchAllTopics,
     fetchArticleById,
@@ -134,5 +143,6 @@ module.exports = {
     fetchCommentsByArticleId,
     insertComment,
     updateArticleById,
-    removeCommentById
+    removeCommentById,
+    fetchAllUsers
 }

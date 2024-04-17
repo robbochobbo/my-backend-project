@@ -5,7 +5,8 @@ const {
     fetchCommentsByArticleId,
     insertComment,
     updateArticleById,
-    removeCommentById
+    removeCommentById,
+    fetchAllUsers
 } = require("../models/models")
 
 const getAllTopics = (req, res, next) => {
@@ -67,6 +68,13 @@ const deleteCommentById = (req, res, next) => {
     .catch((err) => next(err))
 }
 
+const getAllUsers = (req, res, next) => {
+    fetchAllUsers().then((users) => {
+        res.status(200).send({users})
+    })
+    .catch((err) => next(err))
+}
+
 module.exports = { 
     getAllTopics,
     getArticleById,
@@ -74,5 +82,6 @@ module.exports = {
     getCommentsByArticleId,
     postComment,
     patchArticleById,
-    deleteCommentById
+    deleteCommentById,
+    getAllUsers
 }

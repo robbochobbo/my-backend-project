@@ -69,17 +69,52 @@
   "POST /api/articles/:article_id/comments": {
     "description": "responds with comment given by client and inserts it into comments table at given article_id",
     "exampleResponse": {
-      "postedComment": 
+      "updatedArticle":[ 
         {
-          "comment_id": 19,
-          "body": "Comment body",
-          "article_id": 3,
+          "article_id": 1,
+          "title": "Living in the shadow of a great man",
+          "topic": "mitch",
           "author": "butter_bridge",
-          "votes": 0,
-          "created_at": "2024-04-17T10:10:11.624Z"
+          "body": "I find this existence challenging",
+          "created_at": "2020-07-09T20:11:00.000Z",
+          "votes": 90,
+          "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
         }
+      ]
+    }
+  },
+  "DELETE /api/comments/:comment_id": {
+    "description": "Responds with status 204 and no content, removes comment of given comment_id"
+  },
+  "GET /api/users": {
+    "description": "Responds with an array of all users with the correct properties",
+    "exampleResponse": {
+      "users": [
+        {
+          "username": "butter_bridge",
+          "name": "jonny",
+          "avatar_url": "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg"
+        },
+        {
+          "username": "icellusedkars",
+          "name": "sam",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4"
+        },
+        {
+          "username": "lurker",
+          "name": "do_nothing",
+          "avatar_url": "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png"
+        },
+        {
+          "username": "rogersop",
+          "name": "paul",
+          "avatar_url": "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4"
+        }
+      ]
     }
   }
+
+
 
 
 }
