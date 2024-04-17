@@ -218,6 +218,27 @@ describe('/api/articles', () => {
             expect(articles).toBeSortedBy('created_at',{descending:true})
         })
     })
+
+    test('GET 200: responds with articles filtered by topic query', () => {
+        return request(app)
+        .get('/api/articles?topic=cats')
+        .expect(200)
+        .then(({body: {articles}}) => {
+            console.log(articles);
+            articles.forEach((article) => {
+                expect(article.topic).toBe('cats')
+            })
+        })
+    })
+
+    test('GET 400: responds with error and msg when topic value is invalid', () => {
+        return request(app)
+        .get('/api/articles?topic=9999')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    })
 })
 
 describe('/api/articles/:article_id/comments', () => {
