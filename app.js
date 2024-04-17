@@ -6,8 +6,12 @@ const {
     getAllTopics,
     getArticleById,
     getAllArticles,
-    getCommentsByArticleId
+    getCommentsByArticleId,
+    postComment
  } = require('./controllers/controllers')
+
+
+app.use(express.json())
 
 app.get('/api', (req, res) => {
     res.status(200).send({endpoints})
@@ -21,6 +25,7 @@ app.get('/api/articles', getAllArticles)
 
 app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
 
+app.post('/api/articles/:article_id/comments', postComment)
 
 
 // error handling
