@@ -47,22 +47,36 @@ const fetchArticleById = (article_id) => {
     });
 }
 
-const fetchAllArticles = () => {
+const fetchAllArticles = (topic) => {
+
+    const queryValues = []
+    let queryString = `SELECT 
+                        articles.author,
+                        articles.title,
+                        articles.article_id,
+                        articles.topic,
+                        articles.created_at,
+                        articles.votes,
+                        articles.article_img_url,
+                        COUNT(articles.article_id) AS comment_count
+                        FROM articles
+                        LEFT JOIN comments  
+                            ON comments.article_id = articles.article_id`
+
+    const regex = /[a-zA-Z]/
+    if (topic && regex.test(topic)) {
+        queryValues.push(topic);
+        queryString += ` WHERE topic = $1`;
+        }
+    else if (topic && (!regex.test(topic))){
+       return Promise.reject({status: 400, msg:'Bad request'})
+    }
+
+    queryString += ` GROUP BY articles.article_id
+                    ORDER BY created_at DESC`
+
     return db
-    .query(`SELECT 
-            articles.author,
-            articles.title,
-            articles.article_id,
-            articles.topic,
-            articles.created_at,
-            articles.votes,
-            articles.article_img_url,
-            COUNT(articles.article_id) AS comment_count
-            FROM articles
-            LEFT JOIN comments  
-                ON comments.article_id = articles.article_id
-            GROUP BY articles.article_id
-            ORDER BY created_at DESC`)
+    .query(queryString, queryValues)
     .then((body) => { 
         return body.rows
          })
