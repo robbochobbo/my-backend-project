@@ -224,7 +224,6 @@ describe('/api/articles', () => {
         .get('/api/articles?topic=cats')
         .expect(200)
         .then(({body: {articles}}) => {
-            console.log(articles);
             articles.forEach((article) => {
                 expect(article.topic).toBe('cats')
             })
