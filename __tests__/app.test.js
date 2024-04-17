@@ -257,6 +257,7 @@ describe('/api/articles/:article_id/comments', () => {
             }) 
         })
     })
+
     test('GET 200: responds with comments sorted by date descending', () => {
         return request(app)
         .get('/api/articles/1/comments')
@@ -265,6 +266,35 @@ describe('/api/articles/:article_id/comments', () => {
             expect(comments).toBeSortedBy('created_at',{descending:true})
         })
     })
+
+    test('GET 200: responds with the total count of comments of given article_id', () => {
+        return request(app)
+        .get('/api/articles/9(comment_count)')
+        .expect(200)
+        .then(({body: {comment_count}}) => {
+            expect(comment_count).toBe(2)
+        })
+    })
+
+    test('GET 200: responds with count of 0 comments for article_id that is valid but does not exist yet', () => {
+        return request(app)
+        .get('/api/articles/999999(comment_count)')
+        .expect(200)
+        .then(({body: {comment_count}}) => {
+            expect(comment_count).toBe(0)
+        })
+    })
+
+    test('GET 404: responds with 400 and err msg if client searches for comment_count of and invalid id', () => {
+        return request(app)
+        .get('/api/articles/not_a_valid_id(comment_count)')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    })
+
+
     test('GET 404: responds with 404 and err msg if article_id does not exist', () => {
         return request(app)
         .get('/api/articles/9999/comments')

@@ -28,6 +28,7 @@
   },
   "GET /api/articles/:article_id": {
     "description": "serves an array of an article object of a given article_id",
+    "feature": "GET /api/articles/:article_id(comment_count) returns comment_count",
     "exampleResponse": {
         "articles": [
           {
