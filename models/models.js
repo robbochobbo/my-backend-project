@@ -114,11 +114,25 @@ const updateArticleById = (patchVotesObject, article_id) => {
     })
 }
 
+const removeCommentById = (comment_id) => {
+    return db
+    .query(`DELETE FROM comments
+            WHERE comment_id = $1
+            RETURNING *;`, [comment_id])
+    .then((body) => {
+        if(body.rows[0] === undefined){
+            return Promise.reject({status: 404, msg:'Not found'})
+        }
+        return
+    })
+}
+
 module.exports = { 
     fetchAllTopics,
     fetchArticleById,
     fetchAllArticles,
     fetchCommentsByArticleId,
     insertComment,
-    updateArticleById
+    updateArticleById,
+    removeCommentById
 }
