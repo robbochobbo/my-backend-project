@@ -7,7 +7,8 @@ const {
     getArticleById,
     getAllArticles,
     getCommentsByArticleId,
-    postComment
+    postComment,
+    patchArticleById
  } = require('./controllers/controllers')
 
 
@@ -20,6 +21,7 @@ app.get('/api', (req, res) => {
 app.get('/api/topics', getAllTopics)
 
 app.get('/api/articles/:article_id', getArticleById)
+app.patch('/api/articles/:article_id', patchArticleById)
 
 app.get('/api/articles', getAllArticles)
 
@@ -39,6 +41,17 @@ app.use((err, req, res, next) => {
     }
     else next(err)
 })
+
+app.use((err, request, response, next) => {
+    if (err.code === '23502') {
+        response.status(400).send({msg: "Bad request"})
+    }
+    if(err.code === '22P02') {
+        response.status(400).send({msg: "Bad request"})
+    }
+    else next(err)
+  })
+
 
 app.use((err, req, res, next) => {
     res.status(500).send({msg: "Internal server error"})

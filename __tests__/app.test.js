@@ -145,7 +145,51 @@ describe('/api/articles/:article_id', () => {
             expect(body.msg).toBe('Bad request')
         })
     })
+
+    test('PATCH 200: responds with the updated article and increments the given article_id.votes by amount given in object, ', () => {
+        const patchVotesObject = { inc_votes: -10}
+        return request(app)
+        .patch('/api/articles/1')
+        .send(patchVotesObject)
+        .expect(200)
+        .then(({body: {updatedArticle}}) => {
+            expect(updatedArticle.votes).toBe(90)
+        })
+    })
+
+    test('PATCH 200: updates articles that did not have a votes property with new votes', () => {
+        const patchVotesObject = { inc_votes: 10}
+        return request(app)
+            .patch('/api/articles/3')
+            .send(patchVotesObject)
+            .expect(200)
+            .then(({body: {updatedArticle}}) => {
+                expect(updatedArticle.votes).toBe(10)
+        })
+    })
+
+    test('PATCH 400: responds with an 400 and msg when provided with incorrect type in object', () => {
+        const patchVotesObject = { inc_votes: "incorrect value type"}
+        return request(app)
+            .patch('/api/articles/3')
+            .send(patchVotesObject)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe('Bad request')
+        })
+    })
+    test('PATCH 400: responds with an 400 and msg when provided with malformed object', () => {
+        const patchVotesObject = {}
+        return request(app)
+            .patch('/api/articles/3')
+            .send(patchVotesObject)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe('Bad request')
+        })
+    })
 })
+
 
 describe('/api/articles', () => {
     test('GET 200: responds with an array of objects of articles, each with the correct properties', () => {
@@ -230,7 +274,6 @@ describe('/api/articles/:article_id/comments', () => {
         .send(newComment)
         .expect(201)
         .then(({body: {postedComment}}) => {
-            console.log(postedComment);
             expect(postedComment.article_id).toBe(3)
             expect(postedComment.author).toBe("butter_bridge")
             expect(postedComment.body).toBe("Comment body")
@@ -255,7 +298,5 @@ describe('/api/articles/:article_id/comments', () => {
             expect(body.msg).toBe('Bad request');
         });
       });
-
 })
-
 

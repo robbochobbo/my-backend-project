@@ -93,9 +93,6 @@ const fetchCommentsByArticleId = (article_id) => {
 
 const insertComment = (newComment, article_id) => {
     const {username, body} = newComment
-    if(body === undefined){
-        return Promise.reject({status: 400, msg:'Bad request'})
-    }
     return db
     .query(`INSERT INTO comments (author, body, article_id) 
             VALUES ($1, $2, $3) 
@@ -106,10 +103,22 @@ const insertComment = (newComment, article_id) => {
     })
 }
 
+const updateArticleById = (patchVotesObject, article_id) => {
+    return db
+    .query(`UPDATE articles
+            SET votes = votes + $1
+            WHERE article_id = $2
+            RETURNING *`, [patchVotesObject.inc_votes, article_id])
+    .then((body) => {
+        return body.rows[0]
+    })
+}
+
 module.exports = { 
     fetchAllTopics,
     fetchArticleById,
     fetchAllArticles,
     fetchCommentsByArticleId,
-    insertComment
+    insertComment,
+    updateArticleById
 }

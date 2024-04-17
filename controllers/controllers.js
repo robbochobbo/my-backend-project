@@ -3,7 +3,8 @@ const {
     fetchArticleById,
     fetchAllArticles,
     fetchCommentsByArticleId,
-    insertComment
+    insertComment,
+    updateArticleById
 } = require("../models/models")
 
 const getAllTopics = (req, res, next) => {
@@ -40,10 +41,19 @@ const getCommentsByArticleId = (req, res, next) => {
 }
 
 const postComment = (req, res, next) => {
-    const {article_id} = req.params
     const newComment = req.body
+    const {article_id} = req.params
     insertComment(newComment, article_id).then((postedComment) => {
         res.status(201).send({postedComment})
+    })
+    .catch((err) => next(err))
+}
+
+const patchArticleById = (req, res, next) => {
+    const patchVotesObject = req.body
+    const { article_id } = req.params
+    updateArticleById(patchVotesObject, article_id).then((updatedArticle) => {
+        res.status(200).send({updatedArticle})
     })
     .catch((err) => next(err))
 }
@@ -53,5 +63,6 @@ module.exports = {
     getArticleById,
     getAllArticles,
     getCommentsByArticleId,
-    postComment
+    postComment,
+    patchArticleById
 }
