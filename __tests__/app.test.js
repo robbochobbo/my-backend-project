@@ -146,7 +146,7 @@ describe('/api/articles/:article_id', () => {
         })
     })
 
-    test('PATCH 200: responds with the updated article and increments the given article_id.votes by amount given in object, ', () => {
+    test('PATCH 200: responds with the updated article and increments the given article_id.votes by amount given in object', () => {
         const patchVotesObject = { inc_votes: -10}
         return request(app)
         .patch('/api/articles/1')
@@ -333,3 +333,29 @@ describe('/api/comments/comment_id', () => {
     })
 })
 
+describe('/api/users', () => {
+    test('GET 200: Responds with an array of all users with the correct properties', () => {
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then(({body: {users}}) => {
+            expect(users.length).toBe(4)
+            users.forEach((user) => {
+                expect(typeof user.username).toBe('string')
+                expect(typeof user.name).toBe('string')
+                expect(typeof user.avatar_url).toBe('string')
+            })
+        })
+    })
+
+    test('GET 200: responds with users sorted by username, alphabetically', () => {
+        return request(app)
+        .get('/api/users')
+        .expect(200)
+        .then(({body: {users}}) => {
+            expect(users).toBeSortedBy("username")
+        })
+    })
+
+    
+})

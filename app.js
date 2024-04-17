@@ -9,7 +9,8 @@ const {
     getCommentsByArticleId,
     postComment,
     patchArticleById,
-    deleteCommentById
+    deleteCommentById,
+    getAllUsers
  } = require('./controllers/controllers')
 
 
@@ -31,6 +32,7 @@ app.post('/api/articles/:article_id/comments', postComment)
 
 app.delete('/api/comments/:comment_id', deleteCommentById)
 
+app.get('/api/users', getAllUsers)
 
 // error handling
 app.get('/api/*', (req, res, next) => {
