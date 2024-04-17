@@ -21,8 +21,14 @@ const getAllTopics = (req, res, next) => {
 
 const getArticleById = (req, res, next) => {
     const { article_id } = req.params
-    fetchArticleById(article_id).then((article) => {
-        res.status(200).send({article})
+    fetchArticleById(article_id).then((response) => {
+        if(Object.hasOwn(response[0], 'comment_count')){
+            const comment_count_number = Number(response[0].comment_count)
+            res.status(200).send({comment_count: comment_count_number})
+        }
+        else{
+            res.status(200).send({article: response})
+        }
     })
     .catch((err) => next(err))
 }
