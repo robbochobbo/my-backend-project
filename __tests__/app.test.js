@@ -219,6 +219,43 @@ describe('/api/articles/:article_id/comments', () => {
     })
 })
 
+describe('/api/articles/:article_id/comments', () => {
+    test('POST 201: responds with comment given by client and inserts it into comments table at given article_id', () => {
+        const newComment =  {
+            username: "butter_bridge",
+            body: "Comment body"
+        }
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send(newComment)
+        .expect(201)
+        .then(({body: {postedComment}}) => {
+            console.log(postedComment);
+            expect(postedComment.article_id).toBe(3)
+            expect(postedComment.author).toBe("butter_bridge")
+            expect(postedComment.body).toBe("Comment body")
+        })
+        .then(()=> {
+            return db 
+            .query(`SELECT * FROM comments`)
+        })
+        .then((body) => {
+            expect(body.rows.length).toBe(19)
+        })
+    })
 
+    test('POST:400 responds with an 400 and msg when provided with an incomplete object (no body)', () => {
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send({
+            username: "butter_bridge"
+        })
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request');
+        });
+      });
+
+})
 
 
