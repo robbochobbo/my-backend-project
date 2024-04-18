@@ -129,6 +129,17 @@ describe('/api/articles/:article_id', () => {
             expect(typeof article[0].article_img_url).toBe('string')
         })
     })
+
+    test('GET 200: responds with given article_id with correct properties, now including comment_count', () => {
+        return request(app)
+        .get('/api/articles/3')
+        .expect(200)
+        .then(({body : {article}}) => {
+            expect(article[0].comment_count).toBe("2")
+            
+        })
+    })
+
     test('GET 404: responds with 404 and err msg if article does not exist', () => {
         return request(app)
         .get('/api/articles/102')
@@ -209,6 +220,7 @@ describe('/api/articles', () => {
             })
         })
     })
+    
 
     test('GET 200: responds with articles sorted by date descending', () => {
         return request(app)
@@ -266,34 +278,6 @@ describe('/api/articles/:article_id/comments', () => {
             expect(comments).toBeSortedBy('created_at',{descending:true})
         })
     })
-
-    test('GET 200: responds with the total count of comments of given article_id', () => {
-        return request(app)
-        .get('/api/articles/9(comment_count)')
-        .expect(200)
-        .then(({body: {comment_count}}) => {
-            expect(comment_count).toBe(2)
-        })
-    })
-
-    test('GET 200: responds with count of 0 comments for article_id that is valid but does not exist yet', () => {
-        return request(app)
-        .get('/api/articles/999999(comment_count)')
-        .expect(200)
-        .then(({body: {comment_count}}) => {
-            expect(comment_count).toBe(0)
-        })
-    })
-
-    test('GET 404: responds with 400 and err msg if client searches for comment_count of and invalid id', () => {
-        return request(app)
-        .get('/api/articles/not_a_valid_id(comment_count)')
-        .expect(400)
-        .then(({body}) => {
-            expect(body.msg).toBe('Bad request')
-        })
-    })
-
 
     test('GET 404: responds with 404 and err msg if article_id does not exist', () => {
         return request(app)

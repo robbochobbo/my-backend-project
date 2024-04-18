@@ -31,29 +31,24 @@ const fetchAllTopics = (sort_by='slug', order='ASC', slug) => {
 }
 
 const fetchArticleById = (article_id) => {
-    const regex = /\d\(comment_count\)/
 
-    if (isNaN(article_id)) {
-        if (!regex.test(article_id)) {
-            return Promise.reject({ status: 400, msg: 'Bad request' });
-        } else if (isNaN(article_id) && regex.test(article_id)) {
-            
-            return db
-            .query(`SELECT COUNT(*) AS comment_count
-                    FROM comments
-                    WHERE article_id = $1`, [article_id.split('(')[0]])
-            .then((body) => {
-                if(body.rows.length === 0){
-                    return Promise.reject({status: 404, msg:'Article does not exist'})
-                  }
-                return body.rows;
-            })
-        }
-    }
     return db
-    .query(`SELECT *
+    .query(`SELECT 
+            articles.author,
+            articles.title,
+            articles.article_id,
+            articles.body,
+            articles.topic,
+            articles.created_at,
+            articles.votes,
+            articles.article_img_url,
+            COUNT(articles.article_id) AS comment_count
             FROM articles
-            WHERE articles.article_id = $1;`, [article_id])
+            LEFT JOIN comments  
+                ON comments.article_id = articles.article_id
+            WHERE articles.article_id = $1
+            GROUP BY articles.article_id
+            ORDER BY created_at DESC;`, [article_id])
     .then((body) => {
     if(body.rows.length === 0){
         return Promise.reject({status: 404, msg:'Article does not exist'})
