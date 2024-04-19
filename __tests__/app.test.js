@@ -340,21 +340,6 @@ describe('/api/articles/:article_id/comments', () => {
             expect(body.rows.length).toBe(comments.length + 1)
         })
     })
-    
-describe('/api/comments/comment_id', () => {
-    test('DELETE 204: Responds with status 200 and no content, removes comment of given comment_id', () => {
-        return request(app)
-        .delete('/api/comments/1')
-        .expect(204)
-        .then(() => {
-            return db
-            .query(`SELECT * FROM comments`)
-        })
-        .then((body) => {
-            expect(body.rows.length).toBe(comments.length)
-        })
-    })
-
     test('POST 201: responds with comment given by client and inserts it into comments table at given article_id and ignores unneccesary properties', () => {
         return request(app)
         .post('/api/articles/3/comments')
@@ -403,7 +388,6 @@ describe('/api/comments/comment_id', () => {
             expect(body.msg).toBe('Bad request')
         })
     })
-
     test('POST 400: responds with a 400 and msg when trying to post while missing username', () => {
         return request(app)
         .post('/api/articles/3/comments')
@@ -415,22 +399,34 @@ describe('/api/comments/comment_id', () => {
             expect(body.msg).toBe('Bad request')
         })
     })
-
     test('POST 400: responds with a 404 and msg when post is valid but article is invalid', () => {
         return request(app)
         .post('/api/articles/invalid_article_name/comments')
         .send({
             username: "butter_bridge",
             body: "comment body"
-        })
+            })
         .expect(400)
         .then(({body}) => {
             expect(body.msg).toBe('Bad request')
+            })
+        })
+    })  
+    
+    
+describe('/api/comments/comment_id', () => {
+    test('DELETE 204: Responds with status 200 and no content, removes comment of given comment_id', () => {
+        return request(app)
+        .delete('/api/comments/1')
+        .expect(204)
+        .then(() => {
+            return db
+            .query(`SELECT * FROM comments`)
+        })
+        .then((body) => {
+            expect(body.rows.length).toBe(comments.length + 1)
         })
     })
-
-})
-
 
     test('DELETE 404: Responds with status 404 and msg if comment does not exist', () => {
         return request(app)
@@ -447,6 +443,77 @@ describe('/api/comments/comment_id', () => {
         .expect(400)
         .then(({body}) => {
             expect(body.msg).toBe('Bad request')
+        })
+    })
+
+    test('PATCH 200: Responds with comment, accepts an object of inc_votes that will increment votes by value', () => {
+        const patchCommentVotesObject = { inc_votes: 10}
+        return request(app)
+        .patch('/api/comments/5')
+        .send(patchCommentVotesObject)
+        .expect(200)
+        .then(({body: comment}) => {
+            expect(typeof comment).toBe('object')
+            expect(typeof comment.comment_id).toBe('number')
+            expect(typeof comment.votes).toBe('number')
+            expect(typeof comment.created_at).toBe('string')
+            expect(typeof comment.author).toBe('string')
+            expect(typeof comment.body).toBe('string')
+            expect(typeof comment.article_id).toBe('number')
+        })
+    })
+
+    test('PATCH 200: increments votes by correct value', () => {
+        const patchCommentVotesObject = { inc_votes: 10}
+        return request(app)
+        .patch('/api/comments/5')
+        .send(patchCommentVotesObject)
+        .expect(200)
+        .then(({body: comment}) => {
+            expect(comment.votes).toBe(20)
+        })
+    })
+
+    ///////////////////////
+
+    test('PATCH 400: responds with an 400 and msg when provided with incorrect type in object', () => {
+        const patchCommentVotesObject = { inc_votes: "incorrect value type"}
+        return request(app)
+            .patch('/api/comments/3')
+            .send(patchCommentVotesObject)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe('Bad request')
+        })
+    })
+    test('PATCH 400: responds with an 400 and msg when provided with malformed object', () => {
+        const patchCommentVotesObject = {}
+        return request(app)
+            .patch('/api/comments/3')
+            .send(patchCommentVotesObject)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe('Bad request')
+        })
+    })
+    test('PATCH 400: responds with an 400 and msg when trying to patch at invalid id', () => {
+        const patchCommentVotesObject = { inc_votes: 10}
+        return request(app)
+            .patch('/api/comments/invalid_id')
+            .send(patchCommentVotesObject)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe('Bad request')
+        })
+    })
+    test('PATCH 400: responds with an 404 and msg when trying to patch at valid article_id but does not exist', () => {
+        const patchCommentVotesObject = { inc_votes: 10}
+        return request(app)
+            .patch('/api/comments/99999')
+            .send(patchCommentVotesObject)
+            .expect(404)
+            .then(({body}) => {
+                expect(body.msg).toBe('Not found')
         })
     })
 })
@@ -498,3 +565,4 @@ describe('/api/users/:username', () => {
         })
     })
 })
+

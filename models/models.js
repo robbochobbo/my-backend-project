@@ -136,6 +136,18 @@ const removeCommentById = (comment_id) => {
     })
 }
 
+const updateCommentById = (patchCommentVotesObject, comment_id) => {
+    return db
+    .query(`UPDATE comments
+            SET votes = votes + $1
+            WHERE comment_id = $2
+            RETURNING *`, [patchCommentVotesObject.inc_votes, comment_id])
+    .then((body) => {
+        return body.rows[0]
+    })
+
+}
+
 const fetchAllUsers = () => {
     return db
     .query(`SELECT * FROM users
@@ -162,5 +174,6 @@ module.exports = {
     updateArticleById,
     removeCommentById,
     fetchAllUsers,
-    fetchUserByUsername
+    fetchUserByUsername,
+    updateCommentById
 }
