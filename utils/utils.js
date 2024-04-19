@@ -12,4 +12,5 @@ const checkExists = ((table, column, value) => {
         })
 })
 
+
 module.exports = checkExists

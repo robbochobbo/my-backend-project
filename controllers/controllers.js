@@ -11,7 +11,8 @@ const {
     removeCommentById,
     fetchAllUsers,
     fetchUserByUsername,
-    updateCommentById
+    updateCommentById,
+    insertArticle
 } = require("../models/models")
 
 
@@ -42,6 +43,17 @@ const getAllArticles = (req, res, next) => {
     .catch((err) => next(err))
 }
 
+const postArticle = (req, res, next) => {
+    const newArticleObject = req.body
+
+    if (!newArticleObject.article_img_url){
+        newArticleObject.article_img_url = "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+    }
+    insertArticle(newArticleObject).then((newArticle) => {
+        res.status(200).send({newArticle})
+    })
+}
+
 const getCommentsByArticleId = (req, res, next) => {
     const { article_id } = req.params
     Promise.all([fetchCommentsByArticleId(article_id), checkExists("articles", "article_id", article_id)])
@@ -54,7 +66,6 @@ const getCommentsByArticleId = (req, res, next) => {
 const postComment = (req, res, next) => {
     const newComment = req.body
     const {article_id} = req.params
-
     Promise.all([insertComment(newComment, article_id), checkExists("articles", "article_id", article_id)])
     .then(([postedComment]) => {
         res.status(201).send({postedComment})
@@ -119,5 +130,6 @@ module.exports = {
     deleteCommentById,
     getAllUsers,
     getUserByUsername,
-    patchCommentById
+    patchCommentById,
+    postArticle
 }
