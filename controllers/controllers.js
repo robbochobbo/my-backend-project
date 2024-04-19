@@ -10,7 +10,8 @@ const {
     updateArticleById,
     removeCommentById,
     fetchAllUsers,
-    fetchUserByUsername
+    fetchUserByUsername,
+    updateCommentById
 } = require("../models/models")
 
 
@@ -80,6 +81,17 @@ const deleteCommentById = (req, res, next) => {
     .catch((err) => next(err))
 }
 
+const patchCommentById = (req, res, next) => {
+    const patchCommentVotesObject = req.body
+    const {comment_id} = req.params
+
+    Promise.all([updateCommentById(patchCommentVotesObject, comment_id), checkExists("comments", "comment_id", comment_id)])
+    .then(([comment]) => {
+        res.status(200).send(comment)
+    })
+    .catch((err) => next(err))
+}
+
 const getAllUsers = (req, res, next) => {
     fetchAllUsers().then((users) => {
         res.status(200).send({users})
@@ -106,5 +118,6 @@ module.exports = {
     patchArticleById,
     deleteCommentById,
     getAllUsers,
-    getUserByUsername
+    getUserByUsername,
+    patchCommentById
 }

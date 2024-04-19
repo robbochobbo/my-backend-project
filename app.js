@@ -11,7 +11,8 @@ const {
     patchArticleById,
     deleteCommentById,
     getAllUsers,
-    getUserByUsername
+    getUserByUsername,
+    patchCommentById
  } = require('./controllers/controllers')
 
 
@@ -30,6 +31,7 @@ app.get('/api/articles/:article_id/comments', getCommentsByArticleId)
 app.post('/api/articles/:article_id/comments', postComment)
 
 app.delete('/api/comments/:comment_id', deleteCommentById)
+app.patch('/api/comments/:comment_id', patchCommentById)
 
 app.get('/api/users', getAllUsers)
 app.get('/api/users/:username', getUserByUsername)
