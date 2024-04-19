@@ -1,3 +1,6 @@
+const checkExists = require('../utils/utils')
+const endpoints = require('../endpoints.json')
+
 const { 
     fetchAllTopics, 
     fetchArticleById,
@@ -8,6 +11,11 @@ const {
     removeCommentById,
     fetchAllUsers
 } = require("../models/models")
+
+
+const getAllApis = (req, res) => {
+    res.status(200).send({endpoints})
+}
 
 const getAllTopics = (req, res, next) => {
 
@@ -37,7 +45,8 @@ const getAllArticles = (req, res, next) => {
 
 const getCommentsByArticleId = (req, res, next) => {
     const { article_id } = req.params
-    fetchCommentsByArticleId(article_id).then((comments) => {
+    Promise.all([fetchCommentsByArticleId(article_id), checkExists("articles", "article_id", article_id)])
+    .then(([comments]) => {
         res.status(200).send({comments})
     })
     .catch((err) => next(err))
@@ -46,16 +55,20 @@ const getCommentsByArticleId = (req, res, next) => {
 const postComment = (req, res, next) => {
     const newComment = req.body
     const {article_id} = req.params
-    insertComment(newComment, article_id).then((postedComment) => {
+
+    Promise.all([insertComment(newComment, article_id), checkExists("articles", "article_id", article_id)])
+    .then(([postedComment]) => {
         res.status(201).send({postedComment})
     })
-    .catch((err) => next(err))
+    .catch((err) => {
+        next(err)})
 }
 
 const patchArticleById = (req, res, next) => {
     const patchVotesObject = req.body
     const { article_id } = req.params
-    updateArticleById(patchVotesObject, article_id).then((updatedArticle) => {
+    Promise.all([updateArticleById(patchVotesObject, article_id), checkExists("articles", "article_id", article_id)])
+    .then(([updatedArticle]) => {
         res.status(200).send({updatedArticle})
     })
     .catch((err) => next(err))
@@ -64,7 +77,7 @@ const patchArticleById = (req, res, next) => {
 const deleteCommentById = (req, res, next) => {
     const { comment_id } = req.params
     removeCommentById(comment_id).then(() => {
-        res.status(200).send()
+        res.status(204).send()
     })
     .catch((err) => next(err))
 }
@@ -77,6 +90,7 @@ const getAllUsers = (req, res, next) => {
 }
 
 module.exports = { 
+    getAllApis,
     getAllTopics,
     getArticleById,
     getAllArticles,

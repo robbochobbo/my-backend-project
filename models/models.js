@@ -1,3 +1,4 @@
+const { response } = require('express')
 const db = require('../db/connection')
 
 const fetchAllTopics = (sort_by='slug', order='ASC', slug) => {
@@ -6,15 +7,9 @@ const fetchAllTopics = (sort_by='slug', order='ASC', slug) => {
 
     if (slug){
         queryValues.push(slug)
-        queryString += ` WHERE slug = $1`
+        queryString += ` WHERE slug = $1 `
     }
-
-    const validSortBys = ['slug','description']
-    if(!validSortBys.includes(sort_by)){
-        return Promise.reject({status: 400, msg:'Bad request'})
-    } else{
-        queryString += ` ORDER BY ${sort_by}`
-    }
+        queryString += ` ORDER BY slug`
 
     const validOrders = ['ASC', 'DESC']
     if(!validOrders.includes(order.toUpperCase())){
@@ -94,25 +89,14 @@ const fetchAllArticles = (topic) => {
 }
 
 const fetchCommentsByArticleId = (article_id) => {
-    if(isNaN(article_id)){
-        return Promise.reject({status: 400, msg:'Bad request'})
-    }
+
     return db
-    .query(`SELECT 
-            comments.comment_id,
-            comments.votes,
-            comments.created_at,
-            comments.author,
-            comments.body,
-            comments.article_id
+    .query(`SELECT *
             FROM comments
             WHERE comments.article_id = $1
             ORDER BY created_at DESC;`, [article_id])
     .then((body) => {
-        if(body.rows.length === 0){
-            return Promise.reject({status: 404, msg:'Article does not exist'})
-          }
-        return body.rows
+            return body.rows
     })
 }
 

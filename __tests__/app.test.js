@@ -4,7 +4,8 @@ const seed = require('../db/seeds/seed')
 const testData = require('../db/data/test-data/index')
 const request = require('supertest')
 const endpoints = require('../endpoints.json')
-const articles = require('../db/data/test-data/articles')
+const comments = require('../db/data/test-data/comments.js')
+
 
 beforeAll(() => seed(testData))
 afterAll(() => db.end())
@@ -53,15 +54,6 @@ describe('/api/topics', () => {
             expect(topics).toBeSortedBy("slug")
         })
     })
-    
-    test('GET 200: response is sorted by given query',()=>{
-        return request(app)
-        .get('/api/topics?sort_by=description')
-        .expect(200)
-        .then(({body: description})=>{
-            expect(description).toBeSortedBy('description')
-        })
-    })
 
     test('GET 200: response is sorted by order provided',()=>{
         return request(app)
@@ -91,15 +83,6 @@ describe('/api/topics', () => {
             expect(body).toEqual([])
         })
     })
-
-    test('GET 400: responds with 400 and err msg if user gives invalid sort_by query', () => {
-        return request(app)
-        .get('/api/topics?sort_by=invalid_column_name')
-        .expect(400)
-        .then(({body}) => {
-            expect(body.msg).toBe('Bad request')
-        })
-    })    
 
     test('GET 400: responds with 400 and err msg if user gives invalid order query',()=>{
         return request(app)
@@ -199,6 +182,26 @@ describe('/api/articles/:article_id', () => {
                 expect(body.msg).toBe('Bad request')
         })
     })
+    test('PATCH 400: responds with an 400 and msg when trying to patch at invalid id', () => {
+        const patchVotesObject = {}
+        return request(app)
+            .patch('/api/articles/invalid_id')
+            .send(patchVotesObject)
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe('Bad request')
+        })
+    })
+    test('PATCH 400: responds with an 404 and msg when trying to patch at valid article_id but does not exist', () => {
+        const patchVotesObject = {}
+        return request(app)
+            .patch('/api/articles/99999')
+            .send(patchVotesObject)
+            .expect(404)
+            .then(({body}) => {
+                expect(body.msg).toBe('Not found')
+        })
+    })
 })
 
 
@@ -208,6 +211,7 @@ describe('/api/articles', () => {
         .get('/api/articles')
         .expect(200)
         .then(({body: {articles}}) => {
+            expect(articles.length).toBe(13)
             articles.forEach((article) => {
                 expect(typeof article.author).toBe('string')
                 expect(typeof article.title).toBe('string')
@@ -217,10 +221,10 @@ describe('/api/articles', () => {
                 expect(typeof article.votes).toBe('number')
                 expect(typeof article.article_img_url).toBe('string')
                 expect(typeof article.comment_count).toBe('string')
+                expect(typeof article.body).toBe('undefined') 
             })
         })
     })
-    
 
     test('GET 200: responds with articles sorted by date descending', () => {
         return request(app)
@@ -239,6 +243,15 @@ describe('/api/articles', () => {
             articles.forEach((article) => {
                 expect(article.topic).toBe('cats')
             })
+        })
+    })
+
+    test('GET 200: responds with empty array when articles filtered by topic query is valid but do not exist yet', () => {
+        return request(app)
+        .get('/api/articles?topic=paper')
+        .expect(200)
+        .then(({body: {articles}}) => {
+            expect(articles.length).toBe(0)
         })
     })
 
@@ -279,12 +292,23 @@ describe('/api/articles/:article_id/comments', () => {
         })
     })
 
+    
+    test('GET 200: article_id is valid but there are no associated comments', () => {
+        return request(app)
+        .get('/api/articles/4/comments')
+        .expect(200)
+        .then(({body: {comments}}) => {
+            expect(comments.length).toBe(0)
+        }) 
+       
+    })
+
     test('GET 404: responds with 404 and err msg if article_id does not exist', () => {
         return request(app)
         .get('/api/articles/9999/comments')
         .expect(404)
         .then(({body}) => {
-            expect(body.msg).toBe('Article does not exist')
+            expect(body.msg).toBe('Not found')
         })
     })
     test('GET 400: responds with 400 and err msg if user passes invalid article id type', () => {
@@ -298,11 +322,11 @@ describe('/api/articles/:article_id/comments', () => {
 })
 
 describe('/api/articles/:article_id/comments', () => {
+    const newComment =  {
+        username: "butter_bridge",
+        body: "Comment body"
+    }
     test('POST 201: responds with comment given by client and inserts it into comments table at given article_id', () => {
-        const newComment =  {
-            username: "butter_bridge",
-            body: "Comment body"
-        }
         return request(app)
         .post('/api/articles/3/comments')
         .send(newComment)
@@ -317,36 +341,100 @@ describe('/api/articles/:article_id/comments', () => {
             .query(`SELECT * FROM comments`)
         })
         .then((body) => {
-            expect(body.rows.length).toBe(19)
+            expect(body.rows.length).toBe(comments.length + 1)
         })
     })
-
-    test('POST 400: responds with an 400 and msg when provided with an incomplete object (no body)', () => {
-        return request(app)
-        .post('/api/articles/3/comments')
-        .send({
-            username: "butter_bridge"
-        })
-        .expect(400)
-        .then(({body}) => {
-            expect(body.msg).toBe('Bad request')
-        })
-      })
-})
-
+    
 describe('/api/comments/comment_id', () => {
-    test('DELETE 200: Responds with status 204 and no content, removes comment of given comment_id', () => {
+    test('DELETE 204: Responds with status 200 and no content, removes comment of given comment_id', () => {
         return request(app)
         .delete('/api/comments/1')
-        .expect(200)
+        .expect(204)
         .then(() => {
             return db
             .query(`SELECT * FROM comments`)
         })
         .then((body) => {
-            expect(body.rows.length).toBe(18)
+            expect(body.rows.length).toBe(comments.length)
         })
     })
+
+    test('POST 201: responds with comment given by client and inserts it into comments table at given article_id and ignores unneccesary properties', () => {
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send({
+            username: "butter_bridge",
+            body: "comment body 2",
+        })
+        .expect(201)
+        .then(({body: {postedComment}}) => {
+            expect(postedComment.article_id).toBe(3)
+            expect(postedComment.author).toBe("butter_bridge")
+            expect(postedComment.body).toBe("comment body 2")
+        })
+    })
+    test('POST 400: responds with a 400 and msg when provided with an incomplete object (no body)', () => {
+        return request(app)
+        .post('/api/articles/3/comments')
+            .send({
+                username: "butter_bridge"
+            })
+            .expect(400)
+            .then(({body}) => {
+                expect(body.msg).toBe('Bad request')
+            })
+        })
+        
+    test('POST 404: responds with a 404 and msg when trying to post to an valid but non-existent article', () => {
+        return request(app)
+        .post('/api/articles/9999/comments')
+        .send(newComment)
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe("Bad request")
+        })
+    })
+
+    test('POST 400: responds with a 400 and msg when trying to post with invalid username', () => {
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send({
+            username: "not_a_valid_username",
+            body: "comment body"
+        })
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    })
+
+    test('POST 400: responds with a 400 and msg when trying to post while missing username', () => {
+        return request(app)
+        .post('/api/articles/3/comments')
+        .send({
+            body: "comment body"
+        })
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    })
+
+    test('POST 400: responds with a 404 and msg when post is valid but article is invalid', () => {
+        return request(app)
+        .post('/api/articles/invalid_article_name/comments')
+        .send({
+            username: "butter_bridge",
+            body: "comment body"
+        })
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    })
+
+})
+
 
     test('DELETE 404: Responds with status 404 and msg if comment does not exist', () => {
         return request(app)

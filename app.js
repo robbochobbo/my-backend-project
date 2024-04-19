@@ -1,8 +1,8 @@
 const express = require('express')
 const app = express()
-const endpoints = require('./endpoints.json')
 
 const {
+    getAllApis,
     getAllTopics,
     getArticleById,
     getAllArticles,
@@ -16,9 +16,7 @@ const {
 
 app.use(express.json())
 
-app.get('/api', (req, res) => {
-    res.status(200).send({endpoints})
-})
+app.get('/api', getAllApis)
 
 app.get('/api/topics', getAllTopics)
 
@@ -51,6 +49,9 @@ app.use((err, request, response, next) => {
         response.status(400).send({msg: "Bad request"})
     }
     if(err.code === '22P02') {
+        response.status(400).send({msg: "Bad request"})
+    }
+    if(err.code === '23503') {
         response.status(400).send({msg: "Bad request"})
     }
     else next(err)
