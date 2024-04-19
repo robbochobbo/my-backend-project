@@ -1,11 +1,12 @@
 const { response } = require('express')
 const db = require('../db/connection')
+const checkExists = require('../utils/utils')
 
 const fetchAllTopics = () => {
    return db
    .query(`SELECT * FROM topics ORDER BY slug ASC;`)
    .then((body) => {
-    return body.rows
+        return body.rows
    })
 }
 
@@ -39,6 +40,11 @@ const fetchArticleById = (article_id) => {
 
 const fetchAllArticles = (topic) => {
 
+    const regex = /[a-zA-Z]/
+    if (topic && (!regex.test(topic))){
+        return Promise.reject({status: 400, msg:'Bad request'})
+     }
+
     const queryValues = []
     let queryString = `SELECT 
                         articles.author,
@@ -52,14 +58,10 @@ const fetchAllArticles = (topic) => {
                         FROM articles
                         LEFT JOIN comments  
                             ON comments.article_id = articles.article_id`
-
-    const regex = /[a-zA-Z]/
-    if (topic && regex.test(topic)) {
+    if(topic){
+        checkExists("topics", "slug", topic)
         queryValues.push(topic);
-        queryString += ` WHERE topic = $1`;
-        }
-    else if (topic && (!regex.test(topic))){
-       return Promise.reject({status: 400, msg:'Bad request'})
+        queryString += ` WHERE topic = $1`
     }
 
     queryString += ` GROUP BY articles.article_id

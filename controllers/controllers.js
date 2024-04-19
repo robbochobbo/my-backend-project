@@ -18,7 +18,6 @@ const getAllApis = (req, res) => {
 }
 
 const getAllTopics = (req, res, next) => {
-
     fetchAllTopics().then((topics) => {
         res.status(200).send(topics)
     })
