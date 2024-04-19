@@ -145,6 +145,14 @@ const fetchAllUsers = () => {
          })
 }
 
+const fetchUserByUsername = (username) => {
+    return db
+    .query(`SELECT * FROM users WHERE username = $1`, [username])
+    .then((body) => { 
+        return body.rows
+    })
+}
+
 module.exports = { 
     fetchAllTopics,
     fetchArticleById,
@@ -153,5 +161,6 @@ module.exports = {
     insertComment,
     updateArticleById,
     removeCommentById,
-    fetchAllUsers
+    fetchAllUsers,
+    fetchUserByUsername
 }

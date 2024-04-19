@@ -9,7 +9,8 @@ const {
     insertComment,
     updateArticleById,
     removeCommentById,
-    fetchAllUsers
+    fetchAllUsers,
+    fetchUserByUsername
 } = require("../models/models")
 
 
@@ -86,6 +87,15 @@ const getAllUsers = (req, res, next) => {
     .catch((err) => next(err))
 }
 
+const getUserByUsername = (req, res, next) => {
+    const {username} = req.params
+    Promise.all([fetchUserByUsername(username), checkExists("users", "username", username)])
+    .then(([user]) => {
+        res.status(200).send(user[0])
+    })
+    .catch((err) => next(err))
+}
+
 module.exports = { 
     getAllApis,
     getAllTopics,
@@ -95,5 +105,6 @@ module.exports = {
     postComment,
     patchArticleById,
     deleteCommentById,
-    getAllUsers
+    getAllUsers,
+    getUserByUsername
 }
