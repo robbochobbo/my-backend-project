@@ -478,6 +478,23 @@ describe('/api/users', () => {
 
 describe('/api/users/:username', () => {
     test('GET 200: Responds with a user object of provided username', () => {
-        
+        return request(app)
+        .get('/api/users/rogersop')
+        .expect(200)
+        .then(({body}) => {
+            expect(typeof body).toBe('object')
+            expect(typeof body.username).toBe('string')
+            expect(typeof body.avatar_url).toBe('string')
+            expect(typeof body.name).toBe('string')
+        })
+    })
+
+    test('GET 404: Responds with status 404 and msg if username does not exist', () => {
+        return request(app)
+        .get('/api/users/username_does_not_exist')
+        .expect(404)
+        .then(({body}) => {
+            expect(body.msg).toBe('Not found')
+        })
     })
 })
