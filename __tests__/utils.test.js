@@ -1,7 +1,5 @@
 const checkExists = require('../utils/utils')
 const db = require('../db/connection')
-const testData = require('../db/data/test-data/index')
-const seed = require('../db/seeds/seed')
 
 afterAll(() => db.end())
 
