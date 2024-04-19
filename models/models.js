@@ -1,28 +1,12 @@
 const { response } = require('express')
 const db = require('../db/connection')
 
-const fetchAllTopics = (sort_by='slug', order='ASC', slug) => {
-    const queryValues = []
-    let queryString = `SELECT * FROM topics`
-
-    if (slug){
-        queryValues.push(slug)
-        queryString += ` WHERE slug = $1 `
-    }
-        queryString += ` ORDER BY slug`
-
-    const validOrders = ['ASC', 'DESC']
-    if(!validOrders.includes(order.toUpperCase())){
-        return Promise.reject({status: 400, msg:'Bad request'})
-    } else{
-        queryString += ` ${order.toUpperCase()};`
-    }
-
-    return db
-    .query(queryString, queryValues)
-    .then((body) => {
-        return body.rows
-    })
+const fetchAllTopics = () => {
+   return db
+   .query(`SELECT * FROM topics ORDER BY slug ASC;`)
+   .then((body) => {
+    return body.rows
+   })
 }
 
 const fetchArticleById = (article_id) => {

@@ -19,9 +19,7 @@ const getAllApis = (req, res) => {
 
 const getAllTopics = (req, res, next) => {
 
-    const {sort_by, order, slug} = req.query
-
-    fetchAllTopics(sort_by, order, slug).then((topics) => {
+    fetchAllTopics().then((topics) => {
         res.status(200).send(topics)
     })
     .catch((err) => next(err))
