@@ -12,7 +12,7 @@ const {
     fetchAllUsers,
     fetchUserByUsername,
     updateCommentById,
-    insertArticle
+    // insertArticle
 } = require("../models/models")
 
 
@@ -43,16 +43,16 @@ const getAllArticles = (req, res, next) => {
     .catch((err) => next(err))
 }
 
-const postArticle = (req, res, next) => {
-    const newArticleObject = req.body
+// const postArticle = (req, res, next) => {
+//     const newArticleObject = req.body
 
-    if (!newArticleObject.article_img_url){
-        newArticleObject.article_img_url = "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
-    }
-    insertArticle(newArticleObject).then((newArticle) => {
-        res.status(200).send({newArticle})
-    })
-}
+//     if (!newArticleObject.article_img_url){
+//         newArticleObject.article_img_url = "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+//     }
+//     insertArticle(newArticleObject).then((newArticle) => {
+//         res.status(200).send({newArticle})
+//     })
+// }
 
 const getCommentsByArticleId = (req, res, next) => {
     const { article_id } = req.params
@@ -131,5 +131,5 @@ module.exports = {
     getAllUsers,
     getUserByUsername,
     patchCommentById,
-    postArticle
+    // postArticle
 }
