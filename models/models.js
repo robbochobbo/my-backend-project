@@ -38,34 +38,49 @@ const fetchArticleById = (article_id) => {
 
 }   
 
-const fetchAllArticles = (topic) => {
+const fetchAllArticles = (topic, sort_by="created_at", order="DESC") => {
 
-    const regex = /[a-zA-Z]/
+    const regex = /[a-zA-Z]/g
     if (topic && (!regex.test(topic))){
         return Promise.reject({status: 400, msg:'Bad request'})
      }
-
     const queryValues = []
+    
     let queryString = `SELECT 
-                        articles.author,
-                        articles.title,
-                        articles.article_id,
-                        articles.topic,
-                        articles.created_at,
-                        articles.votes,
-                        articles.article_img_url,
-                        COUNT(articles.article_id) AS comment_count
-                        FROM articles
-                        LEFT JOIN comments  
-                            ON comments.article_id = articles.article_id`
+    articles.author,
+    articles.title,
+    articles.article_id,
+    articles.topic,
+    articles.created_at,
+    articles.votes,
+    articles.article_img_url,
+    COUNT(articles.article_id) AS comment_count
+    FROM articles
+    LEFT JOIN comments  
+    ON comments.article_id = articles.article_id`
+    
     if(topic){
         checkExists("topics", "slug", topic)
         queryValues.push(topic);
         queryString += ` WHERE topic = $1`
     }
+    
+    queryString += ` GROUP BY articles.article_id`
+    
+    const validSortBys = ['author', 'title', 'article_id', 'topic', 'created_at', 'votes']
+    if(!validSortBys.includes(sort_by)){
+        return Promise.reject({status: 400, msg:'Bad request'})
+    }
+    if(sort_by){
+        queryString += ` ORDER BY ${sort_by}`
+    }
 
-    queryString += ` GROUP BY articles.article_id
-                    ORDER BY created_at DESC`
+    const validOrders = ['ASC', 'DESC']
+    if(!validOrders.includes(order.toUpperCase())){
+        return Promise.reject({status: 400, msg:'Bad request'})
+    }
+ 
+    queryString += ` ${order.toUpperCase()}`
 
     return db
     .query(queryString, queryValues)

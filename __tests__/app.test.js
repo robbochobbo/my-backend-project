@@ -188,7 +188,7 @@ describe('/api/articles', () => {
         })
     })
 
-    test('GET 200: responds with articles sorted by date descending', () => {
+    test('GET 200: responds with articles sorted by date descending by default', () => {
         return request(app)
         .get('/api/articles')
         .expect(200)
@@ -217,9 +217,43 @@ describe('/api/articles', () => {
         })
     })
 
+    test('GET 200: sorts by given sort_by, descending', () => {
+        return request(app)
+        .get('/api/articles?sort_by=title')
+        .expect(200)
+        .then(({body: {articles}}) => {
+            expect(articles).toBeSortedBy('title', {descending:true})
+        })
+    })
+
+    test('GET 200: orders by given order', () => {
+        return request(app)
+        .get('/api/articles?order=asc')
+        .expect(200)
+        .then(({body: {articles}}) => {
+            expect(articles).toBeSortedBy('created_at')
+        })
+    })
+    
     test('GET 400: responds with error and msg when topic value is invalid', () => {
         return request(app)
         .get('/api/articles?topic=9999')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    })
+    test('GET 400: responds with error and msg when sort_by value is invalid', () => {
+        return request(app)
+        .get('/api/articles?sort_by=invalid_sort_by')
+        .expect(400)
+        .then(({body}) => {
+            expect(body.msg).toBe('Bad request')
+        })
+    })
+    test('GET 400: responds with error and msg when order value is invalid', () => {
+        return request(app)
+        .get('/api/articles?order=invalid_order')
         .expect(400)
         .then(({body}) => {
             expect(body.msg).toBe('Bad request')
