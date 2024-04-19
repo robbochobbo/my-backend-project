@@ -1,4 +1,3 @@
-const { response } = require('express')
 const db = require('../db/connection')
 const checkExists = require('../utils/utils')
 

@@ -474,6 +474,10 @@ describe('/api/users', () => {
             expect(users).toBeSortedBy("username")
         })
     })
+})
 
-    
+describe('/api/users/:username', () => {
+    test('GET 200: Responds with a user object of provided username', () => {
+        
+    })
 })
