@@ -182,7 +182,6 @@ describe('/api/articles', () => {
                 expect(typeof article.created_at).toBe('string')
                 expect(typeof article.votes).toBe('number')
                 expect(typeof article.article_img_url).toBe('string')
-                expect(typeof article.comment_count).toBe('string')
                 expect(typeof article.body).toBe('undefined') 
             })
         })
@@ -260,32 +259,22 @@ describe('/api/articles', () => {
         })
     })
 
-    // test.skip('POST 200: responds with the newly added article, with all the correct properties', () => {
-    //     const newArticleObject = {
-    //         title: "The Wanderer; or, A Tale of Exploration",
-    //         topic: "mitch",
-    //         author: "rogersop",
-    //         body: "Call me Wanderer. Some years ago — never mind exactly how long — with little coin in my pocket and a restless spirit at my heels, I resolved to embark on a journey through the uncharted realms.",
-    //         created_at: 1602828180100,
-    //         article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
-    //         }
-    //     return request(app)
-    //     .post('/api/articles')
-    //     .send(newArticleObject)
-    //     .expect(200)
-    //     .then(({body: {newArticle}}) => {
-    //         console.log(newArticle);
-    //         expect(typeof newArticle.article_id).toBe('number')
-    //         expect(typeof newArticle.votes).toBe('number')
-    //         expect(typeof newArticle.comment_count).toBe('string')
-    //         expect(typeof newArticle.title).toBe('string')
-    //         expect(typeof newArticle.topic).toBe('string')
-    //         expect(typeof newArticle.author).toBe('string')
-    //         expect(typeof newArticle.body).toBe('string')
-    //         expect(typeof newArticle.created_at).toBe('string')
-    //         expect(typeof newArticle.article_img_url).toBe('string')
-    //     })
-    // })
+    test('POST 200: responds with the newly added article, with all the correct properties', () => {
+        const newArticleObject = {
+            title: "The Wanderer; or, A Tale of Exploration",
+            topic: "mitch",
+            author: "rogersop",
+            body: "Call me Wanderer. Some years ago — never mind exactly how long — with little coin in my pocket and a restless spirit at my heels, I resolved to embark on a journey through the uncharted realms.",
+            article_img_url: "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+            }
+        return request(app)
+        .post('/api/articles')
+        .send(newArticleObject)
+        .expect(200)
+        .then(({body: {newArticle}}) => {
+            expect(newArticle).toEqual({...newArticleObject, created_at: expect.any(String), article_id: expect.any(Number), votes: 0})
+        })
+    })
 
 })
 

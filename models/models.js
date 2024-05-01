@@ -86,17 +86,16 @@ const fetchAllArticles = (topic, sort_by="created_at", order="DESC") => {
          })
 }
 
-// const insertArticle = (newArticleObject) => {
-//     const comment_count = 0
-//     return db
-//     .query(`INSERT INTO articles (author, title, body, topic, article_img_url, comment_count) 
-//             VALUES ($1, $2, $3, $4, $5, $6) 
-//             RETURNING *;`, [newArticleObject.author, newArticleObject.title, newArticleObject.body, newArticleObject.topic, newArticleObject.article_img_url, comment_count])
-//     .then((body) => {
-//         console.log(body.rows);
-//         return body.rows[0]
-//     })
-// }
+const insertArticle = (newArticleObject) => {
+    const comment_count = 0
+    return db
+    .query(`INSERT INTO articles (author, title, body, topic, article_img_url) 
+            VALUES ($1, $2, $3, $4, $5) 
+            RETURNING *;`, [newArticleObject.author, newArticleObject.title, newArticleObject.body, newArticleObject.topic, newArticleObject.article_img_url])
+    .then((body) => {
+        return body.rows[0]
+    })
+}
 
 const fetchCommentsByArticleId = (article_id) => {
     return db
@@ -185,5 +184,5 @@ module.exports = {
     fetchAllUsers,
     fetchUserByUsername,
     updateCommentById,
-    // insertArticle
+    insertArticle
 }
