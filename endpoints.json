@@ -25,6 +25,19 @@
       ]
     }
   },
+  "POST /api/article": {
+    "description": "adds an article",
+    "exampleResponse":  {
+      "article_id": 14,
+      "title": "The Wanderer; or, A Tale of Exploration",
+      "topic": "mitch",
+      "author": "rogersop",
+      "body": "Call me Wanderer. Some years ago — never mind exactly how long — with little coin in my pocket and a restless spirit at my heels, I resolved to embark on a journey through the uncharted realms.",
+      "created_at": "2024-05-03T11:24:52.491Z",
+      "votes": 0,
+      "article_img_url": "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
+    }
+  },
   "GET /api/articles/:article_id": {
     "description": "serves an article object of a given article_id",
     "exampleResponse": {
