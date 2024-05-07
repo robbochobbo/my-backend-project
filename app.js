@@ -1,5 +1,6 @@
 const express = require('express')
 const app = express()
+const cors = require('cors')
 
 const {
     getAllApis,
@@ -16,6 +17,8 @@ const {
     postArticle
  } = require('./controllers/controllers')
 
+
+app.use(cors())
 
 app.use(express.json())
 
