@@ -64,7 +64,7 @@ const fetchAllArticles = (topic, sort_by="created_at", order="DESC") => {
     
     queryString += ` GROUP BY articles.article_id`
     
-    const validSortBys = ['author', 'title', 'article_id', 'topic', 'created_at', 'votes']
+    const validSortBys = ['author', 'title', 'article_id', 'topic', 'created_at', 'votes', 'comment_count']
     if(!validSortBys.includes(sort_by)){
         return Promise.reject({status: 400, msg:'Bad request'})
     }
