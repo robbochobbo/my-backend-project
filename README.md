@@ -8,13 +8,7 @@ To clone this repo:
 - Fork on GitHub: https://github.com/robbochobbo/my-backend-project
 - In your terminal, type: ```git clone https://github.com/robbochobbo/my-backend-project.git ```
 
-In the project, install the following dependencies:
-- jest: ```npm i jest -D```
-- pg-format: ```npm i pg-format -D```
-- supertest: ```npm i supertest -D```
-- dotenv: ```npm i dotenv```
-- express: ```npm i express```
-- postgres: ```npm i pg```
+In the project, install dependencies with ```npm i```
 
 To seed your local database:
 - ```npm setup-dbs```
